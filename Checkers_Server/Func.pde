@@ -12,6 +12,8 @@ void initBoard() {
 }
 
 void drawBoard() {
+  println(mustJump);
+
   for (int x = 0; x < board.length; x++)
     for (int y = 0; y < board[0].length; y++) {
       // Draw Board
@@ -59,13 +61,13 @@ void clicked(int x, int y) {
   }
   // a piece is already selected, attempt to move, deselect, or select another piece
   if (isValid(x, y)) { // if (x, y) is a valid move, then move
-    if (mustJump) { // if mustJump is true, then that means the valid move is a jump and the captured piece must be removed
-      if (x > sx) { //test if jumping to the right
-        board[sx+1][sy-1] = EMPTY;
-      } else { // otherwise must be jumping to the left 
-        board[sx-1][sy-1] = EMPTY;
-      }
-    }
+    // if mustJump is true, then that means the valid move is a jump and the captured piece must be removed
+    if (x > sx + 1) // test if jumping to the right
+      board[x-1][y+1] = EMPTY;
+    else if (x < sx - 1)  // otherwise must be jumping to the left 
+      board[x+1][y+1] = EMPTY;
+
+
     clearValid(); // clear all valid moves
     board[sx][sy] = EMPTY; // set the selected piece to empty
     board[x][y] = BLACK; // 'move' to piece to (x, y) and set it to black -> server is black
@@ -75,23 +77,24 @@ void clicked(int x, int y) {
 }
 
 void findValid(int x, int y) {
-  boolean jump = false;
+  mustJump = false;
   if (board[x][y] == BLACK && y > 0) {
     // jump over a piece
     if (x < 6 && board[x+1][y-1] == WHITE && board[x+2][y-2] == EMPTY) {
       board[x+2][y-2] = VALID;
-      jump = true;
+      mustJump = true;
     }
     if (x > 1 && board[x-1][y-1] == WHITE && board[x-2][y-2] == EMPTY) {
       board[x-2][y-2] = VALID;
-      jump = true;
+      mustJump = true;
     }
 
     // standard diagnol move -> only if jump move is not available
-    if (!mustJump && !jump) {
-      if (board[x+1][y-1] == EMPTY)
+    if (!mustJump) {
+      if (x < 7 && board[x+1][y-1] == EMPTY)
         board[x+1][y-1] = VALID;
-      if (board[x-1][y-1] == EMPTY)
+
+      if (x > 0 && board[x-1][y-1] == EMPTY)
         board[x-1][y-1] = VALID;
     }
   } else if (board[x][y] == WHITE) {

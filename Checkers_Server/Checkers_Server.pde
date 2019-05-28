@@ -42,6 +42,7 @@ void setup() {
   // Temp pieces to test jumping
   board[1][4] = WHITE;
   board[3][4] = WHITE;
+  //board[5][4] = WHITE;
 }
 
 
